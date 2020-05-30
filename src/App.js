@@ -44,6 +44,9 @@ outline:none;
 &:focus{
   border-color: #005CAF;
 }
+&:focus + button{
+  background-color: #005CAF;
+}
 `;
 
 const Button = styled.button`
@@ -57,7 +60,9 @@ cursor: pointer;
 
 const AddBtn = styled(Button)`
 &:focus{
+  outline-color: #005CAF;
   background-color: #005CAF;
+  border-radius: 0;
 }
 `;
 
@@ -65,7 +70,7 @@ const Add = () => {
   return (
     <Header className="add">
       <Title for="add__input">代辦清單</Title>
-      <Input id="add__input" type="text" placeholder="請輸入待辦事項" />
+      <Input id="add__input" className="add__input" type="text" placeholder="請輸入待辦事項" />
       <AddBtn className="btn add__btn" onclick="">
         <FontAwesomeIcon className="fa-lg" icon={faPlusSquareRegular} />
       </AddBtn>
