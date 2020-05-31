@@ -89,92 +89,31 @@ const ItemBtn = styled.div`
   margin: 6px 5px;
 `;
 
-const handleEdit = (id, text) => {
-}
+const ItemInput = styled(Input)`
+  border: none;
+`;
 
-const handleDelete = (id) => {
-}
+const handleEdit = (id, text, todoList, setTodoList, editingID, setEditingID) => {
+  setEditingID(editingID === '' ? editingID = id : (editingID !== id ? editingID = id : setTodoList(
+    text === '' ? todoList :
+      todoList.map(
+        todo => todo.id === id ? { ...todo, value: text } : todo
+      )
+  )))
+};
 
-const handleCheck = (id,state) => {
-}
+const handleDelete = (id, todoList, setTodoList) => {
+  setTodoList(todoList.filter(todo => (todo.id !== id)));
+};
 
-const Add = ({ addTodo }) => {
-  const [value, setValue] = useState('');
-  return (
-    <Form onSubmit={(e) => {
-      e.preventDefault();
-      addTodo(value);
-      setValue('')
-    }}>
-      <Title htmlFor="add__input">
-        代辦清單
-      </Title>
-      <Input
-        id="add__input"
-        name="add__input"
-        type="text"
-        placeholder="請輸入待辦事項"
-        value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-        }}
-      />
-      <AddBtn >
-        <FontAwesomeIcon className="fa-2x" icon={faPlusSquareRegular} />
-      </AddBtn>
-    </Form >
-  );
-}
-
-const Wait = (props) => {
-  return (
-    <div>
-      <ItemTitle>代辦項目</ItemTitle>
-      <Item key={123}>
-        <ItemText>testestestsee</ItemText>
-        <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faEditSolid} onClick={() => { handleEdit() }} /></ItemBtn>
-        <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faTrashAltSolid} onClick={() => { handleDelete() }} /></ItemBtn>
-        <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faCheckSquareRegular} onClick={() => { handleCheck() }} /></ItemBtn>
-      </Item >
-      {
-        props.todoList.map((list) => {
-          return (
-            list.state ? '' :
-              <Item key={list.id}>
-                <ItemText>{list.value}</ItemText>
-                <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faEditSolid} onClick={() => { handleEdit(list.id, list.value) }} /></ItemBtn>
-                <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faTrashAltSolid} onClick={() => { handleDelete(list.id) }} /></ItemBtn>
-                <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faCheckSquareRegular} onClick={() => { handleCheck(list.id, list.state) }} /></ItemBtn>
-              </Item>
-          )
-        })
-      }
-    </div >
-  );
-}
-
-const Done = (props) => {
-  return (
-    <div>
-      <ItemTitle>完成項目</ItemTitle>
-      <Item key={444}>
-        <ItemText>dddd</ItemText>
-        <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faTrashAltSolid} /></ItemBtn>
-        <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faCheckSquareSolid} /></ItemBtn>
-      </Item>
-      {props.todoList.map((list) => {
-        return (
-          !list.state ? '' :
-            <Item key={list.id}>
-              <ItemText>{list.value}</ItemText>
-              <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faTrashAltSolid} onClick={() => { handleDelete(list.id) }} /></ItemBtn>
-              <ItemBtn><FontAwesomeIcon className="fa-lg" icon={faCheckSquareSolid} onClick={() => { handleCheck(list.id, list.state) }} /></ItemBtn>
-            </Item>
-        )
-      })}
-    </div>
-  );
-}
+const handleCheck = (id, todoList, setTodoList) => {
+  setTodoList(
+    todoList.map(
+      todo =>
+        todo.id === id ? { ...todo, state: !todo.state } : todo
+    )
+  )
+};
 
 const setUUID = () => {
   var d = Date.now();
@@ -188,14 +127,49 @@ const setUUID = () => {
   });
 }
 
-
 const App = () => {
   const [todoList, setTodoList] = useState([])
+  const [editingID, setEditingID] = useState('');
 
   useEffect(() => {
+    console.log(editingID)
     return (() => {
+      console.log(editingID)
     })
   })
+
+  const Add = ({ addTodo }) => {
+    const [value, setValue] = useState('');
+
+    return (
+      <Form onSubmit={(e) => {
+        e.preventDefault();
+        addTodo(value);
+        setValue('')
+      }}>
+        <Title htmlFor="add__input">
+          代辦清單
+        </Title>
+        <Input
+          id="add__input"
+          name="add__input"
+          type="text"
+          placeholder="請輸入待辦事項"
+          value={value}
+          required
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+        />
+        <AddBtn >
+          <FontAwesomeIcon
+            className="fa-2x"
+            icon={faPlusSquareRegular}
+          />
+        </AddBtn>
+      </Form >
+    );
+  }
 
   return (
     <Container>
@@ -209,9 +183,93 @@ const App = () => {
           }
           ])
         }
-      }} />
-      <Wait todoList={todoList} />
-      <Done todoList={todoList} />
+      }}
+      />
+      <ItemTitle>代辦項目</ItemTitle>
+      {
+        todoList.map((todo) => {
+          if (!todo.state && todo.id !== editingID) {
+            return (
+              <Item key={todo.id}>
+                <ItemText>{todo.value}</ItemText>
+                <ItemBtn>
+                  <FontAwesomeIcon className="fa-lg"
+                    icon={faEditSolid}
+                    onClick={() => { handleEdit(todo.id, '', todoList, setTodoList, editingID, setEditingID) }}
+                  />
+                </ItemBtn>
+                <ItemBtn>
+                  <FontAwesomeIcon className="fa-lg"
+                    icon={faTrashAltSolid}
+                    onClick={() => { handleDelete(todo.id, todoList, setTodoList) }}
+                  />
+                </ItemBtn>
+                <ItemBtn>
+                  <FontAwesomeIcon className="fa-lg"
+                    icon={faCheckSquareRegular}
+                    onClick={() => { handleCheck(todo.id, todoList, setTodoList) }}
+                  />
+                </ItemBtn>
+              </Item>
+            )
+          } else if (!todo.state && todo.id === editingID) {
+            return (
+              <Item key={todo.id}>
+                <ItemInput
+                  autoFocus
+                  placeholder={todo.value}
+                  onChange={(e) => {
+                  }}
+                />
+                <ItemBtn>
+                  <FontAwesomeIcon
+                    className="fa-lg"
+                    icon={faEditSolid}
+                    onClick={() => { handleEdit(todo.id, '', todoList, setTodoList, editingID, setEditingID) }}
+                  />
+                </ItemBtn>
+                <ItemBtn>
+                  <FontAwesomeIcon
+                    className="fa-lg"
+                    icon={faTrashAltSolid}
+                    onClick={() => { handleDelete(todo.id, todoList, setTodoList) }}
+                  />
+                </ItemBtn>
+                <ItemBtn>
+                  <FontAwesomeIcon
+                    className="fa-lg"
+                    icon={faCheckSquareRegular}
+                    onClick={() => { handleCheck(todo.id, todoList, setTodoList) }}
+                  />
+                </ItemBtn>
+              </Item>
+            )
+          }
+        })
+      }
+      <ItemTitle>完成項目</ItemTitle>
+      {todoList.map((todo) => {
+        return (
+          !todo.state ? '' :
+            <Item key={todo.id}>
+              <ItemText>{todo.value}</ItemText>
+              <ItemBtn>
+                <FontAwesomeIcon
+                  className="fa-lg"
+                  icon={faTrashAltSolid}
+                  onClick={() => { handleDelete(todo.id, todoList, setTodoList) }}
+                />
+              </ItemBtn>
+              <ItemBtn>
+                <FontAwesomeIcon
+                  className="fa-lg"
+                  icon={faCheckSquareSolid}
+                  onClick={() => { handleCheck(todo.id, todoList, setTodoList) }}
+                />
+              </ItemBtn>
+            </Item>
+        )
+      })}
     </Container>
   );
 }
