@@ -81,6 +81,7 @@ const Add = () => {
 const Wait = () => {
   return (
     <div>
+      wait
       <FontAwesomeIcon icon={faEditSolid} />
       <FontAwesomeIcon icon={faTrashAltSolid} />
       <FontAwesomeIcon icon={faCheckSquareRegular} />
@@ -91,6 +92,7 @@ const Wait = () => {
 const Done = () => {
   return (
     <div>
+      done
       <FontAwesomeIcon icon={faTrashAltSolid} />
       <FontAwesomeIcon icon={faCheckSquareSolid} />
     </div>
