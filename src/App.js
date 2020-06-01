@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faPlusSquare as faPlusSquareSolid,
   faTrashAlt as faTrashAltSolid,
   faEdit as faEditSolid,
   faCheckSquare as faCheckSquareSolid,
@@ -11,7 +10,9 @@ import {
   faPlusSquare as faPlusSquareRegular,
   faCheckSquare as faCheckSquareRegular,
 } from '@fortawesome/free-regular-svg-icons';
+import { v1 as uuidv1 } from 'uuid';
 import './App.css';
+
 
 const Container = styled.div`
   margin: 3rem auto;
@@ -115,61 +116,48 @@ const handleCheck = (id, todoList, setTodoList) => {
   )
 };
 
-const setUUID = () => {
-  var d = Date.now();
-  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
-    d += performance.now();
-  }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (d + Math.random() * 16) % 16 | 0;
-    d = Math.floor(d / 16);
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
+const Add = ({ addTodo }) => {
+  const [value, setValue] = useState('');
+
+  return (
+    <Form onSubmit={(e) => {
+      e.preventDefault();
+      addTodo(value);
+      setValue('')
+    }}>
+      <Title htmlFor="add__input">
+        代辦清單
+      </Title>
+      <Input
+        id="add__input"
+        name="add__input"
+        type="text"
+        placeholder="請輸入待辦事項"
+        value={value}
+        required
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+      />
+      <AddBtn >
+        <FontAwesomeIcon
+          className="fa-2x"
+          icon={faPlusSquareRegular}
+        />
+      </AddBtn>
+    </Form >
+  );
 }
 
 const App = () => {
   const [todoList, setTodoList] = useState([])
   const [editingID, setEditingID] = useState('');
+  const [value, setValue] = useState('');
 
   useEffect(() => {
-    console.log(editingID)
     return (() => {
-      console.log(editingID)
     })
   })
-
-  const Add = ({ addTodo }) => {
-    const [value, setValue] = useState('');
-
-    return (
-      <Form onSubmit={(e) => {
-        e.preventDefault();
-        addTodo(value);
-        setValue('')
-      }}>
-        <Title htmlFor="add__input">
-          代辦清單
-        </Title>
-        <Input
-          id="add__input"
-          name="add__input"
-          type="text"
-          placeholder="請輸入待辦事項"
-          value={value}
-          required
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
-        />
-        <AddBtn >
-          <FontAwesomeIcon
-            className="fa-2x"
-            icon={faPlusSquareRegular}
-          />
-        </AddBtn>
-      </Form >
-    );
-  }
 
   return (
     <Container>
@@ -177,7 +165,7 @@ const App = () => {
         if (text.length > 0) {
           setTodoList([...todoList,
           {
-            id: setUUID(),
+            id: uuidv1(),
             value: text,
             state: false,
           }
@@ -193,39 +181,44 @@ const App = () => {
               <Item key={todo.id}>
                 <ItemText>{todo.value}</ItemText>
                 <ItemBtn>
-                  <FontAwesomeIcon className="fa-lg"
+                  <FontAwesomeIcon
+                    className="fa-lg"
                     icon={faEditSolid}
                     onClick={() => { handleEdit(todo.id, '', todoList, setTodoList, editingID, setEditingID) }}
                   />
                 </ItemBtn>
                 <ItemBtn>
-                  <FontAwesomeIcon className="fa-lg"
+                  <FontAwesomeIcon
+                    className="fa-lg"
                     icon={faTrashAltSolid}
                     onClick={() => { handleDelete(todo.id, todoList, setTodoList) }}
                   />
                 </ItemBtn>
                 <ItemBtn>
-                  <FontAwesomeIcon className="fa-lg"
+                  <FontAwesomeIcon
+                    className="fa-lg"
                     icon={faCheckSquareRegular}
                     onClick={() => { handleCheck(todo.id, todoList, setTodoList) }}
                   />
                 </ItemBtn>
               </Item>
             )
-          } else if (!todo.state && todo.id === editingID) {
+          } else {
             return (
               <Item key={todo.id}>
                 <ItemInput
                   autoFocus
-                  placeholder={todo.value}
+                  type="text"
+                  defaultValue={todo.value}
                   onChange={(e) => {
+                    setValue(e.target.value)
                   }}
                 />
                 <ItemBtn>
                   <FontAwesomeIcon
                     className="fa-lg"
                     icon={faEditSolid}
-                    onClick={() => { handleEdit(todo.id, '', todoList, setTodoList, editingID, setEditingID) }}
+                    onClick={() => { handleEdit(todo.id, value, todoList, setTodoList, editingID, setEditingID) }}
                   />
                 </ItemBtn>
                 <ItemBtn>
